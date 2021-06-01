@@ -9,11 +9,12 @@
     <h1>Favorite Sellers by Customer</h1>
 
     {% for customer in customer_favorite_seller_list %}
-        <h2>{{ customer.full_name }}</h2>
+        <h2>Customer: {{ customer.user.first_name }} {{ customer.user.last_name }}</h2>
+        <h4>Sellers:</h4>
         <ol>
             {% for favorite_seller in customer.favorite_sellers %}
             <li>
-                {{ favorite_seller.name }}<br>
+                {{ favorite_seller.seller.user.first_name }} {{ favorite_seller.seller.user.last_name }}
             </li>
             {% endfor %}
         </ol>

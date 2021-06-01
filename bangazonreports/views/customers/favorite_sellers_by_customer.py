@@ -1,9 +1,7 @@
 """Module for generating favorite sellers by customer report"""
-import sqlite3
 from django.shortcuts import render
 from bangazonapi.models import Customer, Favorite
 from django.contrib.auth.models import User
-from bangazonreports.views import Connection
 from rest_framework import serializers
 
 def favorite_sellers_by_customer(request):
@@ -11,18 +9,20 @@ def favorite_sellers_by_customer(request):
 
     if request.method == 'GET':
         # Connect to project database
-        favorite_sellers = {}
+        favorite_sellers = []
         customers = Customer.objects.all()
         favorites = Favorite.objects.all()
         for customer in customers:
             this_customers_favorites = favorites.filter(customer_id=customer.id)
             serialized_favorites = FavoritesSerializer(this_customers_favorites, many=True, context={'request': request}).data
             serialized_customer = CustomerSerializer(customer, many=False, context={'request': request}).data
+            serialized_customer['favorite_sellers'] = serialized_favorites
+            favorite_sellers.append(serialized_customer)
 
         # Specify the Django template and provide data context
-        template = 'customers/favorite_sellers_by_user.html'
+        template = 'customers/favorite_sellers.html'
         context = {
-            'userevent_list': favorite_sellers
+            'customer_favorite_seller_list': favorite_sellers
         }
 
         return render(request, template, context)
@@ -48,8 +48,8 @@ class CustomerSerializer(serializers.ModelSerializer):
 
 class FavoritesSerializer(serializers.ModelSerializer):
     """JSON serializer for recommendation customers"""
-    user = UserSerializer()
+    seller = CustomerSerializer()
 
     class Meta:
         model = Customer
-        fields = ('id', 'user',)
+        fields = ('id', 'seller',)
