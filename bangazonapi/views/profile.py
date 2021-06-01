@@ -81,13 +81,14 @@ class Profile(ViewSet):
             }
         """
         try:
-            current_user = Customer.objects.get(user=4)
-            current_user.recommends = Recommendation.objects.filter(recommender=current_user)
+            current_user = Customer.objects.get(user=request.auth.user)
+            current_user.recommends = Recommendation.objects.filter(recommender_id=current_user.id)
+            current_user.recommendations = Recommendation.objects.filter(customer_id=current_user.id)
 
             serializer = ProfileSerializer(
                 current_user, many=False, context={'request': request})
 
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as ex:
             return HttpResponseServerError(ex)
 
@@ -362,6 +363,14 @@ class RecommenderSerializer(serializers.ModelSerializer):
         model = Recommendation
         fields = ('product', 'customer',)
 
+class RecommendationsSerializer(serializers.ModelSerializer):
+    """JSON serializer for recommendations"""
+    recommender = CustomerSerializer()
+    product = ProfileProductSerializer()
+
+    class Meta:
+        model = Recommendation
+        fields = ('product', 'recommender',)
 
 class ProfileSerializer(serializers.ModelSerializer):
     """JSON serializer for customer profile
@@ -371,11 +380,11 @@ class ProfileSerializer(serializers.ModelSerializer):
     """
     user = UserSerializer(many=False)
     recommends = RecommenderSerializer(many=True)
+    recommendations = RecommendationsSerializer(many=True)
 
     class Meta:
         model = Customer
-        fields = ('id', 'url', 'user', 'phone_number',
-                  'address', 'payment_types', 'recommends',)
+        fields = ('id', 'url', 'user', 'phone_number', 'address', 'payment_types', 'recommends', 'recommendations')
         depth = 1
 
 
