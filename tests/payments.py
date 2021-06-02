@@ -47,14 +47,6 @@ class PaymentTests(APITestCase):
         """
         # Add payment type
         self.test_create_payment_type()
-        # url = "/paymenttypes"
-        # data = {
-        #     "merchant_name": "American Express",
-        #     "account_number": "111-1111-1111",
-        #     "expiration_date": "2024-12-31",
-        #     "create_date": datetime.date.today()
-        # }
-        # response = self.client.post(url, data, format='json')
 
         #Delete Payment type
         url = "/paymenttypes/1"
