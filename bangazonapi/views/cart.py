@@ -20,15 +20,13 @@ class Cart(ViewSet):
             HTTP/1.1 204 No Content
         @apiParam {Number} product_id Id of product to add
         """
-        current_user = Customer.objects.get(user=request.auth.user)
 
         try:
-            open_order = Order.objects.get(
-                customer=current_user, payment_type__isnull=True)
+            open_order = Order.objects.get(customer__user=request.auth.user, payment_type__isnull=True)
         except Order.DoesNotExist as ex:
             open_order = Order()
             open_order.created_date = datetime.datetime.now()
-            open_order.customer = current_user
+            open_order.customer = Customer.objects.get(user=request.auth.user)
             open_order.save()
 
         line_item = OrderProduct()
