@@ -121,11 +121,15 @@ class OrderTests(APITestCase):
         # Add Product/Create Order and Close that order with a payment type
         self.test_add_payment_type_to_order()
         # Add another product to an order
-        self.test_add_product_to_order()
+        url = "/cart"
+        data = { "product_id": 1 }
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
+        response = self.client.post(url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
         # Get open order # 2 that should now exist
         url = "/orders/2"
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
         response = self.client.get(url, None, format='json')
         json_response = json.loads(response.content)
 
