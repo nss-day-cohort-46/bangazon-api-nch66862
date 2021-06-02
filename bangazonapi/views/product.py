@@ -1,4 +1,5 @@
 """View module for handling requests about products"""
+from bangazonapi.models.rating import Rating
 from rest_framework.decorators import action
 from bangazonapi.models.recommendation import Recommendation
 import base64
@@ -291,5 +292,21 @@ class Products(ViewSet):
             rec.save()
 
             return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+        return Response(None, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    @action(methods=['post'], detail=True)
+    def rate(self, request, pk=None):
+        """Recommend products to other users"""
+
+        if request.method == "POST":
+            rating = Rating()
+            rating.customer = Customer.objects.get(user=request.auth.user)
+            rating.product = Product.objects.get(pk=pk)
+            rating.score = request.data['score']
+
+            rating.save()
+
+            return Response(None, status=status.HTTP_201_CREATED)
 
         return Response(None, status=status.HTTP_405_METHOD_NOT_ALLOWED)
