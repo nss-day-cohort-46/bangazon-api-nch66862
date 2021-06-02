@@ -126,4 +126,17 @@ class ProductTests(APITestCase):
         self.assertEqual(json_response["location"], "Pittsburgh")
         self.assertEqual(json_response["average_rating"], 4.5)
 
-    # TODO: Delete product
+    def test_add_product_rating(self):
+        """
+        Ensure we can delete a product.
+        """
+        self.test_create_product()
+
+        url = "/products/1"
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
+        response = self.client.delete(url, None, format='json')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        url = "/products/1"
+        response = self.client.get(url, None, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
