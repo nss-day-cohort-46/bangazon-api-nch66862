@@ -55,6 +55,5 @@ class PaymentTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
         #Get Deleted Payment type
-        url = "/paymenttypes/1"
         response = self.client.get(url, None, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
