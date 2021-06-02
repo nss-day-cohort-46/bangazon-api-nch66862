@@ -47,7 +47,7 @@ class PaymentTests(APITestCase):
         Ensure we can delete a payment type for a customer.
         """
         # Add payment type
-        self.test_create_payment_type
+        self.test_create_payment_type()
 
         #Delete Payment type
         url = "/paymenttypes/1"
