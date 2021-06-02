@@ -12,10 +12,10 @@ class Order(models.Model):
 
     @property
     def total_cost(self):
-        """Average rating calculated attribute for each product
+        """Total cost for each order
 
         Returns:
-            number -- The average rating for the product
+            number -- The total cost for the order
         """
         line_items = OrderProduct.objects.filter(order=self)
         total_cost = 0
