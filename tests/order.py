@@ -87,36 +87,30 @@ class OrderTests(APITestCase):
 
     def test_add_payment_type_to_order(self):
         """
-        Ensure we can remove a product from an order.
+        Ensure we can add a payment type to an order.
         """
         # Add product
         self.test_add_product_to_order()
 
         # Get open order
-        open_order = Order.objects.get(
-                customer=current_user, payment_type__isnull=True)
-
-        # add payment type to order
-        url = "/order/1"
-        data = { 
-            "url": "http://localhost:8000/orders/1",
-            "created_date": "2021-05-31",
-            "customer_id": 5,
-            "payment_type_id": 1
-            }
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
-        response = self.client.put(url, data, format='json')
-
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-
-        # Get cart and verify payment type was added
-        url = "/cart"
+        url = "/orders/1"
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
         response = self.client.get(url, None, format='json')
         json_response = json.loads(response.content)
 
+        # add payment type to order
+        data = json_response
+        data['payment_type'] = 1
+        response = self.client.put(url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        # Get order and verify payment type was added
+        url = "/orders/1"
+        response = self.client.get(url, None, format='json')
+        json_response = json.loads(response.content)
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(json_response["size"], 1)
-        self.assertEqual(len(json_response["payment_type_id"]), 1)
+        self.assertEqual(json_response["payment_type"], "http://testserver/paymenttypes/1")
 
     # TODO: New line item is not added to closed order
