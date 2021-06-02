@@ -1,4 +1,5 @@
 """View module for handling requests about customer payment types"""
+import datetime
 from django.http import HttpResponseServerError
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
@@ -33,7 +34,7 @@ class Payments(ViewSet):
         new_payment.merchant_name = request.data["merchant_name"]
         new_payment.account_number = request.data["account_number"]
         new_payment.expiration_date = request.data["expiration_date"]
-        new_payment.create_date = request.data["create_date"]
+        new_payment.create_date = str(datetime.date.today())
         customer = Customer.objects.get(user=request.auth.user)
         new_payment.customer = customer
         new_payment.save()
@@ -54,10 +55,14 @@ class Payments(ViewSet):
             serializer = PaymentSerializer(
                 payment_type, context={'request': request})
             return Response(serializer.data)
+
+        except Payment.DoesNotExist as ex:
+            return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
+
         except Exception as ex:
             return HttpResponseServerError(ex)
 
-    def destroy(self, request, pk=None):
+    def destroy(self, request, pk):
         """Handle DELETE requests for a single payment type
 
         Returns:
@@ -82,7 +87,7 @@ class Payments(ViewSet):
         customer_id = self.request.query_params.get('customer', None)
 
         if customer_id is not None:
-            payment_types = payment_types.filter(customer__id=customer_id)
+            payment_types = payment_types.filter(customer__user=request.auth.user)
 
         serializer = PaymentSerializer(
             payment_types, many=True, context={'request': request})
