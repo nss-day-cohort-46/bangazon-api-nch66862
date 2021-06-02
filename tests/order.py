@@ -92,6 +92,10 @@ class OrderTests(APITestCase):
         # Add product
         self.test_add_product_to_order()
 
+        # Get open order
+        open_order = Order.objects.get(
+                customer=current_user, payment_type__isnull=True)
+
         # add payment type to order
         url = "/order/1"
         data = { 
@@ -105,7 +109,7 @@ class OrderTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-        # Get cart and verify product was removed
+        # Get cart and verify payment type was added
         url = "/cart"
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
         response = self.client.get(url, None, format='json')
