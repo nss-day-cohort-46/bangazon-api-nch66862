@@ -102,7 +102,7 @@ class ProductTests(APITestCase):
 
         url = "/products/1/rate"
         data = {
-            "score": "5",
+            "rating": "5",
         }
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
         response = self.client.post(url, data, format='json')
@@ -110,7 +110,7 @@ class ProductTests(APITestCase):
 
         url = "/products/1/rate"
         data = {
-            "score": "4",
+            "rating": "4",
         }
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
