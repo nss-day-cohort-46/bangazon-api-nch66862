@@ -1,5 +1,6 @@
 """View module for handling requests about customer payment types"""
 import datetime
+from django.contrib.auth.models import User
 from django.http import HttpResponseServerError
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
@@ -8,19 +9,41 @@ from rest_framework import status
 from bangazonapi.models import Payment, Customer
 
 
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+    """JSON serializer for Customer
+
+    Arguments:
+        serializers
+    """
+    class Meta:
+        model = User
+        fields = ('id', 'first_name', 'last_name')
+
+class CustomerSerializer(serializers.HyperlinkedModelSerializer):
+    """JSON serializer for Customer
+
+    Arguments:
+        serializers
+    """
+    user = UserSerializer()
+    class Meta:
+        model = Customer
+        fields = ('id', 'user')
+
 class PaymentSerializer(serializers.HyperlinkedModelSerializer):
     """JSON serializer for Payment
 
     Arguments:
         serializers
     """
+    customer = CustomerSerializer()
     class Meta:
         model = Payment
         url = serializers.HyperlinkedIdentityField(
             view_name='payment',
             lookup_field='id'
         )
-        fields = ('id', 'url', 'merchant_name', 'account_number', 'expiration_date', 'create_date')
+        fields = ('id', 'url', 'merchant_name', 'account_number', 'expiration_date', 'create_date', 'customer')
 
 class Payments(ViewSet):
 
