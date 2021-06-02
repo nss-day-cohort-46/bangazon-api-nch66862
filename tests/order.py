@@ -30,8 +30,8 @@ class OrderTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         # Create a payment type
-        url = "/products"
-        data = { "merchant_name": "Kite", "account_number": 14.99, "expiration_date": 60, "create_date": "It flies high", "customer": 1 }
+        url = "/paymenttypes"
+        data = { "merchant_name": "Houchens", "account_number": 123456789, "expiration_date": "2025-01-01T12:00:00", "create_date": "2021-05-31T12:00:00", "customer_id": 5 }
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
