@@ -117,9 +117,8 @@ class OrderTests(APITestCase):
         """
         Ensure we can add a payment type to an order.
         """
-        # Add product
-        self.test_add_product_to_order()
-        # Close that order with a payment type
+        
+        # Add Product/Create Order and Close that order with a payment type
         self.test_add_payment_type_to_order()
         # Add another product to an order
         self.test_add_product_to_order()
