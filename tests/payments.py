@@ -50,8 +50,8 @@ class PaymentTests(APITestCase):
 
         #Delete Payment type
         url = "/paymenttypes/1"
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
         response = self.client.delete(url, None, format='json')
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
         #Get Deleted Payment type
