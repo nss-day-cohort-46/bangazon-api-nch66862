@@ -113,4 +113,25 @@ class OrderTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(json_response["payment_type"], "http://testserver/paymenttypes/1")
 
-    # TODO: New line item is not added to closed order
+    def test_new_line_item_not_added_to_closed_order(self):
+        """
+        Ensure we can add a payment type to an order.
+        """
+        
+        # Add Product/Create Order and Close that order with a payment type
+        self.test_add_payment_type_to_order()
+        # Add another product to an order
+        url = "/cart"
+        data = { "product_id": 1 }
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
+        response = self.client.post(url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        # Get open order # 2 that should now exist
+        url = "/orders/2"
+        response = self.client.get(url, None, format='json')
+        json_response = json.loads(response.content)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(json_response["payment_type"], None)
