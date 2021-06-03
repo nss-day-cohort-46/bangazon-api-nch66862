@@ -6,21 +6,18 @@ from .customer import Customer
 from .productcategory import ProductCategory
 from .orderproduct import OrderProduct
 from .productrating import ProductRating
-
+from .validators import validate_price
 
 class Product(SafeDeleteModel):
 
     _safedelete_policy = SOFT_DELETE
     name = models.CharField(max_length=50,)
-    customer = models.ForeignKey(
-        Customer, on_delete=models.DO_NOTHING, related_name='products')
-    price = models.FloatField(
-        validators=[MinValueValidator(0.00), MaxValueValidator(10000.00)],)
+    customer = models.ForeignKey(Customer, on_delete=models.DO_NOTHING, related_name='products')
+    price = models.FloatField(validators=[validate_price],)
     description = models.CharField(max_length=255,)
     quantity = models.IntegerField(validators=[MinValueValidator(0)],)
     created_date = models.DateField(auto_now_add=True)
-    category = models.ForeignKey(
-        ProductCategory, on_delete=models.DO_NOTHING, related_name='products')
+    category = models.ForeignKey(ProductCategory, on_delete=models.DO_NOTHING, related_name='products')
     location = models.CharField(max_length=50,)
     image_path = models.ImageField(
         upload_to='products', height_field=None,
