@@ -126,7 +126,7 @@ class ProductTests(APITestCase):
         self.assertEqual(json_response["location"], "Pittsburgh")
         self.assertEqual(json_response["average_rating"], 4.5)
 
-    def test_add_product_rating(self):
+    def test_delete_product(self):
         """
         Ensure we can delete a product.
         """
