@@ -6,9 +6,7 @@ from .customer import Customer
 from .productcategory import ProductCategory
 from .orderproduct import OrderProduct
 from .productrating import ProductRating
-from django.core.exceptions import ValidationError
-from django.utils.translation import gettext_lazy as _
-
+from .validators import validate_price
 
 class Product(SafeDeleteModel):
 
@@ -64,13 +62,6 @@ class Product(SafeDeleteModel):
             return avg
         except ZeroDivisionError:
             return "No Ratings"
-    
-    def validate_price(value):
-        if value <= 17500 and value > 0:
-            raise ValidationError(
-                _('%(value)s is not below $17,500'),
-                params={'value': value},
-            )
 
     class Meta:
         verbose_name = ("product")
