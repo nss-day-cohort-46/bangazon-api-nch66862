@@ -6,21 +6,20 @@ from .customer import Customer
 from .productcategory import ProductCategory
 from .orderproduct import OrderProduct
 from .productrating import ProductRating
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 
 
 class Product(SafeDeleteModel):
 
     _safedelete_policy = SOFT_DELETE
     name = models.CharField(max_length=50,)
-    customer = models.ForeignKey(
-        Customer, on_delete=models.DO_NOTHING, related_name='products')
-    price = models.FloatField(
-        validators=[MinValueValidator(0.00), MaxValueValidator(17500.00)],)
+    customer = models.ForeignKey(Customer, on_delete=models.DO_NOTHING, related_name='products')
+    price = models.FloatField(validators=[validate_price],)
     description = models.CharField(max_length=255,)
     quantity = models.IntegerField(validators=[MinValueValidator(0)],)
     created_date = models.DateField(auto_now_add=True)
-    category = models.ForeignKey(
-        ProductCategory, on_delete=models.DO_NOTHING, related_name='products')
+    category = models.ForeignKey(ProductCategory, on_delete=models.DO_NOTHING, related_name='products')
     location = models.CharField(max_length=50,)
     image_path = models.ImageField(
         upload_to='products', height_field=None,
@@ -65,6 +64,13 @@ class Product(SafeDeleteModel):
             return avg
         except ZeroDivisionError:
             return "No Ratings"
+    
+    def validate_price(value):
+        if value <= 17500 and value > 0:
+            raise ValidationError(
+                _('%(value)s is not below $17,500'),
+                params={'value': value},
+            )
 
     class Meta:
         verbose_name = ("product")

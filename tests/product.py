@@ -143,15 +143,41 @@ class ProductTests(APITestCase):
 
     def test_max_price(self):
         """
-        Ensure we can delete a product.
+        Ensure we can add a product up to $17,500.
         """
-        self.test_create_product()
-
-        url = "/products/1"
+        url = "/products"
+        data = {
+            "name": "Kite",
+            "price": 17500,
+            "quantity": 60,
+            "description": "It flies high",
+            "category_id": 1,
+            "location": "Pittsburgh"
+        }
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
-        response = self.client.delete(url, None, format='json')
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        response = self.client.post(url, data, format='json')
+        json_response = json.loads(response.content)
 
-        url = "/products/1"
-        response = self.client.get(url, None, format='json')
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(json_response["name"], "Kite")
+        self.assertEqual(json_response["price"], 17500)
+        self.assertEqual(json_response["quantity"], 60)
+        self.assertEqual(json_response["description"], "It flies high")
+        self.assertEqual(json_response["location"], "Pittsburgh")
+
+        data = {
+            "name": "Kite",
+            "price": 17501,
+            "quantity": 60,
+            "description": "It flies high",
+            "category_id": 1,
+            "location": "Pittsburgh"
+        }
+        response = self.client.post(url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(json_response["name"], "Kite")
+        self.assertEqual(json_response["price"], 17501)
+        self.assertEqual(json_response["quantity"], 60)
+        self.assertEqual(json_response["description"], "It flies high")
+        self.assertEqual(json_response["location"], "Pittsburgh")
