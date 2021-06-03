@@ -33,9 +33,8 @@ class Product(SafeDeleteModel):
         Returns:
             int -- Number items on completed orders
         """
-        sold = OrderProduct.objects.filter(
-            product=self, order__payment_type__isnull=False)
-        return sold.count()
+        sold = OrderProduct.objects.filter(product=self, order__payment_type__isnull=False).count()
+        return sold
 
     @property
     def can_be_rated(self):
