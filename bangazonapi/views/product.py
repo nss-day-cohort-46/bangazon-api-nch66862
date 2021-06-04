@@ -329,3 +329,37 @@ class Products(ViewSet):
             return Response(None, status=status.HTTP_201_CREATED)
 
         return Response(None, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    @action(methods=['post', 'delete'], detail=True)
+    def like(self, request, pk):
+        """add ratings to a product"""
+
+        if request.method == "POST":
+            customer = Customer.objects.get(user=request.auth.user)
+            product = Product.objects.get(pk=pk)
+            product.liked.add(customer)
+
+            return Response(None, status=status.HTTP_201_CREATED)
+
+        if request.method == "DELETE":
+            customer = Customer.objects.get(user=request.auth.user)
+            product = Product.objects.get(pk=pk)
+            product.liked.remove(customer)
+
+            return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+        return Response(None, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    @action(methods=['get'], detail=False)
+    def liked(self, request):
+        """add ratings to a product"""
+
+        if request.method == "GET":
+            products = Product.objects.all()
+            customer = Customer.objects.get(user=request.auth.user)
+            for product in products:
+                product.is_liked = customer in product.liked.all()
+            serialized = ProductSerializer(products, many=True, context={'request': request})
+            return Response(serialized.data, status=status.HTTP_200_OK)
+
+        return Response(None, status=status.HTTP_405_METHOD_NOT_ALLOWED)
