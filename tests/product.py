@@ -175,9 +175,4 @@ class ProductTests(APITestCase):
         }
         response = self.client.post(url, data, format='json')
 
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(json_response["name"], "Kite")
-        self.assertEqual(json_response["price"], 17501)
-        self.assertEqual(json_response["quantity"], 60)
-        self.assertEqual(json_response["description"], "It flies high")
-        self.assertEqual(json_response["location"], "Pittsburgh")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
