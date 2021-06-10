@@ -252,7 +252,6 @@ class Products(ViewSet):
             ]
         """
         products = Product.objects.all()
-
         # Support filtering by category and/or quantity
         category = self.request.query_params.get('category', None)
         quantity = self.request.query_params.get('quantity', None)
@@ -260,6 +259,7 @@ class Products(ViewSet):
         direction = self.request.query_params.get('direction', None)
         number_sold = self.request.query_params.get('number_sold', None)
         location = self.request.query_params.get('location', None)
+        min_price = self.request.query_params.get('min_price', None)
 
         if order is not None:
             order_filter = order
@@ -286,6 +286,13 @@ class Products(ViewSet):
 
         if location is not None:
             products = products.filter(location__contains=location)
+
+        if min_price is not None:
+            def min_price_filter(product):
+                if product.price >= int(min_price):
+                    return True
+                return False
+            products = filter(min_price_filter, products)
 
         serializer = ProductSerializer(
             products, many=True, context={'request': request})
@@ -320,5 +327,39 @@ class Products(ViewSet):
             rating.save()
 
             return Response(None, status=status.HTTP_201_CREATED)
+
+        return Response(None, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    @action(methods=['post', 'delete'], detail=True)
+    def like(self, request, pk):
+        """add ratings to a product"""
+
+        if request.method == "POST":
+            customer = Customer.objects.get(user=request.auth.user)
+            product = Product.objects.get(pk=pk)
+            product.liked.add(customer)
+
+            return Response(None, status=status.HTTP_201_CREATED)
+
+        if request.method == "DELETE":
+            customer = Customer.objects.get(user=request.auth.user)
+            product = Product.objects.get(pk=pk)
+            product.liked.remove(customer)
+
+            return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+        return Response(None, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    @action(methods=['get'], detail=False)
+    def liked(self, request):
+        """add ratings to a product"""
+
+        if request.method == "GET":
+            products = Product.objects.all()
+            customer = Customer.objects.get(user=request.auth.user)
+            for product in products:
+                product.is_liked = customer in product.liked.all()
+            serialized = ProductSerializer(products, many=True, context={'request': request})
+            return Response(serialized.data, status=status.HTTP_200_OK)
 
         return Response(None, status=status.HTTP_405_METHOD_NOT_ALLOWED)

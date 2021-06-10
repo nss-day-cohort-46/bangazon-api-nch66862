@@ -22,6 +22,7 @@ class Product(SafeDeleteModel):
     image_path = models.ImageField(
         upload_to='products', height_field=None,
         width_field=None, max_length=None, null=True)
+    liked = models.ManyToManyField(Customer, related_name="CustomerLikes")
 
     @property
     def number_sold(self):
@@ -62,6 +63,14 @@ class Product(SafeDeleteModel):
             return avg
         except ZeroDivisionError:
             return "No Ratings"
+
+    @property
+    def is_liked(self):
+        return self.__is_liked
+
+    @is_liked.setter
+    def is_liked(self, value):
+        self.__is_liked = value
 
     class Meta:
         verbose_name = ("product")
